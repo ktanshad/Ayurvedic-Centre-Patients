@@ -36,12 +36,12 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> gotologin() async {
     await Future.delayed(const Duration(seconds: 4));
     Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (ctx) => const LoginScreen()));
+        .pushReplacement(MaterialPageRoute(builder: (ctx) =>  LoginScreen()));
   }
 
   Future<void> checkUserLoggedIn() async {
     final sharedPref = await SharedPreferences.getInstance();
-    final userLoggedIn = sharedPref.getBool("accessToken");
+    final userLoggedIn = sharedPref.getString("accessToken");
     if (userLoggedIn == null || userLoggedIn == false) {
       gotologin();
     } else {

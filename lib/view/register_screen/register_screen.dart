@@ -1,9 +1,10 @@
-import 'package:ayurvedic_centre_patients/view/home_screen.dart';
+
+import 'package:ayurvedic_centre_patients/controller/register_provider.dart';
 import 'package:ayurvedic_centre_patients/view/register_screen/widgets/choosed_treatment_card_widget.dart';
 import 'package:ayurvedic_centre_patients/widgets/dropdown_formfield_widget.dart';
 import 'package:ayurvedic_centre_patients/widgets/text_form_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,36 +14,12 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterState extends State<RegisterScreen> {
-  String? selectedLocation;
-  String? selectedBranch;
-  String? selectedHour;
-  String? selectedMinuts;
-  String? selectedTreatment;
-  DateTime? selectedstartDate;
-  int? patientCount = 0;
-  TextEditingController startDateController = TextEditingController();
-  //----select Dtae------------------------
-  Future<void> selectDate(BuildContext context, DateTime? selectedDate,
-      TextEditingController dateController) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2200),
-    );
-    if (picked != null && picked != selectedDate) {
-      selectedDate = picked;
-      dateController.text = formatDate(selectedDate);
-    }
-  }
 
-  String formatDate(DateTime date) {
-    return date != null ? DateFormat('yyyy-MM-dd').format(date) : '';
-  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+     final registerProvider = Provider.of<RegisterProvider>(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -80,14 +57,17 @@ class _RegisterState extends State<RegisterScreen> {
               color: Colors.black,
             ),
             TextFormWidget(
+              controller: registerProvider.nameController,
               title: " Name",
               hintText: "Enter your full name",
             ),
             TextFormWidget(
+              controller: registerProvider.whatsAppController,
               title: " Whatsapp Number",
               hintText: "Enter your whatsapp number",
             ),
             TextFormWidget(
+              controller: registerProvider.addressController,
               title: " Address",
               hintText: "Enter your full address",
               minLines: 1,
@@ -96,24 +76,26 @@ class _RegisterState extends State<RegisterScreen> {
             DropdownFormFieldWidget(
               title: " Location",
               hintText: "Choose your location ",
-              items: ["london", "kerala", "America"],
-              selectedValue: selectedLocation,
+               items: registerProvider.Location.map((location) => location.toString()).toList(),
+              selectedValue:registerProvider.selectedLocation,
               onChanged: (value) {
-                setState(() {
-                  selectedLocation = value;
-                });
+                registerProvider.setSelectedlocation(value);
               },
             ),
-            DropdownFormFieldWidget(
-              title: " Branch",
-              hintText: "Select the branch",
-              items: ["koduvally", "omassery", "mukkam"],
-              selectedValue: selectedBranch,
-              onChanged: (value) {
-                setState(() {
-                  selectedBranch = value;
-                });
+            Consumer<RegisterProvider>(
+              builder: (context, registerProvider, child) {
+                final branchList=registerProvider.branchList;
+                return    DropdownFormFieldWidget(
+                title: " Branch",
+                hintText: "Select the branch",
+                items:  branchList.map((branch) => branch.name).toList(),
+                selectedValue:registerProvider.selectedBranch,
+                onChanged: (value) {
+                   registerProvider.setSelectedbranch(value);
+                },
+              );
               },
+            
             ),
             ChoosedTreatmentCard(size: size),
             Padding(
@@ -123,171 +105,7 @@ class _RegisterState extends State<RegisterScreen> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return SingleChildScrollView(
-                        child: AlertDialog(
-                          backgroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
-                          content: Column(
-                            children: [
-                              DropdownFormFieldWidget(
-                                title: "Choose Treatment",
-                                hintText: "Choose prefered treatment",
-                                items: ["panjakarama", "njavara kizhi"],
-                                selectedValue: selectedTreatment,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedTreatment = value;
-                                  });
-                                },
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 14),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text("Add Patients")),
-                                        //Male
-                                    Row(
-                                      children: [
-                                        Container(
-                                          height: 40,
-                                          width: 80,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)),
-                                              border: Border.all(
-                                                  color: Color.fromARGB(
-                                                      255, 214, 213, 213))),
-                                          child: Center(child: Text("Male")),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                                onPressed: () {
-                                                  if (patientCount! > 0) {
-                                                    patientCount =
-                                                        patientCount! - 1;
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  Icons.remove_circle_outlined,
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 104, 55),
-                                                )),
-                                            Container(
-                                              height: 40,
-                                              width: 40,
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5)),
-                                                  border: Border.all(
-                                                      color: Color.fromARGB(
-                                                          255, 214, 213, 213))),
-                                              child: Center(
-                                                  child: Text("${patientCount}")),
-                                            ),
-                                            IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    patientCount =
-                                                        patientCount! + 1;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  Icons.add_circle_outlined,
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 104, 55),
-                                                )),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                        
-                        
-                                         Row(
-                                      children: [
-                                        Container(
-                                          height: 40,
-                                          width: 80,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)),
-                                              border: Border.all(
-                                                  color: Color.fromARGB(
-                                                      255, 214, 213, 213))),
-                                          child: Center(child: Text("Female")),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                                onPressed: () {
-                                                  if (patientCount! > 0) {
-                                                    patientCount =
-                                                        patientCount! - 1;
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  Icons.remove_circle_outlined,
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 104, 55),
-                                                )),
-                                            Container(
-                                              height: 40,
-                                              width: 40,
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5)),
-                                                  border: Border.all(
-                                                      color: Color.fromARGB(
-                                                          255, 214, 213, 213))),
-                                              child: Center(
-                                                  child: Text("${patientCount}")),
-                                            ),
-                                            IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    patientCount =
-                                                        patientCount! + 1;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  Icons.add_circle_outlined,
-                                                  color: const Color.fromARGB(
-                                                      255, 0, 104, 55),
-                                                )),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                        
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                    child: MaterialButton(
-                                      //Login button function
-                                      onPressed: () {
-                                       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => HomeScreen(),));
-                                      },
-                                      color: const Color.fromARGB(255, 0, 104, 55),
-                                      height: size.height / 17,
-                                      minWidth: double.infinity,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                      ),
-                                      child:  const Text(
-                                        "Save",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                            ],
-                          ),
-                        ),
-                      );
+                      return AddTreatmentsAlertDialoge( size: size);
                     },
                   );
                 },
@@ -304,86 +122,63 @@ class _RegisterState extends State<RegisterScreen> {
               ),
             ),
             TextFormWidget(
+              controller: registerProvider.totalAmountController,
               title: " Total Ammount",
             ),
             TextFormWidget(
+              controller: registerProvider.balanceAmountController,
               title: " Balance Ammount",
             ),
-            TextFormWidget(
-              title: " Treatment Date",
-              suffixIcon: GestureDetector(
-                  onTap: () async {
-                    await selectDate(
-                        context, selectedstartDate, startDateController);
-                    startDateController.text = formatDate(selectedstartDate!);
-                  },
-                  child: const Icon(Icons.calendar_month_outlined)),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownFormFieldWidget(
-                    hintText: "Hour",
-                    items: [
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                      "8",
-                      "9",
-                      "10",
-                      "11",
-                      "12"
-                    ],
-                    selectedValue: selectedHour,
-                    title: " Treatment Time",
-                    onChanged: (value) {
-                      setState(() {
-                        selectedHour = value;
-                      });
+            Consumer<RegisterProvider>(
+              builder: (context, provider, child) {
+                return    TextFormWidget(
+                  controller: provider.treatmentDateController,
+                title: " Treatment Date",
+                suffixIcon: GestureDetector(
+                    onTap: () async {
+                      await provider.selectDate(context,);
+                    provider.treatmentDateController.text =registerProvider.formatDate(provider.selectedtreatmentDate!);
                     },
-                  ),
-                ),
-                Expanded(
-                  child: DropdownFormFieldWidget(
-                    hintText: "Minuts",
-                    items: [
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                      "8",
-                      "9",
-                      "10",
-                      "11",
-                      "12"
-                    ],
-                    selectedValue: selectedMinuts,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMinuts = value;
-                      });
-                    },
-                  ),
-                )
-              ],
+                    child: const Icon(Icons.calendar_month_outlined)),
+              );
+              },
+          
             ),
+
+
+
+
+              Consumer<RegisterProvider>(
+              builder: (context, provider, child) {
+                return    TextFormWidget(
+                  controller: provider.treatmentTimeController,
+                title: " Treatment Time",
+                   suffixIcon: IconButton(
+                        onPressed: () async {
+                          // Assuming you have a function to pick time
+                          TimeOfDay? selectedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+
+                          if (selectedTime != null) {
+                            String formattedTime =registerProvider.formatTime(selectedTime);
+                            registerProvider.treatmentTimeController.text = formattedTime;
+                          }
+                        },
+                        icon: const Icon(Icons.access_time),
+                      ),
+              );
+              },
+          
+            ),
+           
             Padding(
               padding: const EdgeInsets.all(14),
               child: MaterialButton(
                 //Login button function
-                onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeScreen(),
-                      ));
+                onPressed: () async{
+                       await registerProvider.registerPtients();
                 },
                 color: const Color.fromARGB(255, 0, 104, 55),
                 height: size.height / 17,
@@ -403,3 +198,203 @@ class _RegisterState extends State<RegisterScreen> {
     );
   }
 }
+
+
+
+
+//alert Dialoge
+class AddTreatmentsAlertDialoge extends StatelessWidget {
+  const AddTreatmentsAlertDialoge({
+    super.key,
+    required this.size,
+  });
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+     final registerProvider = Provider.of<RegisterProvider>(context);
+    return SingleChildScrollView(
+      child: AlertDialog(
+        backgroundColor:
+            const Color.fromARGB(255, 255, 255, 255),
+        content: Column(
+          children: [
+            Consumer<RegisterProvider>(
+              builder: (context,registerProvider, child) {
+                final treatmentList=registerProvider.treatmentList;
+                return   SizedBox(
+                  child: DropdownFormFieldWidget(
+                  title: "Choose Treatment",
+                  hintText: "Choose prefered treatment",
+                  items: treatmentList!.map((treatment) => treatment.name).toList(),
+                  selectedValue: registerProvider.selectedTreatment,
+                  onChanged: (value) {
+                    registerProvider.setSelectedTreatment(value);
+                  },
+                                ),
+                );
+              },
+             
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14),
+              child: Column(
+                children: [
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text("Add Patients")),
+                      //Male
+                  Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 80,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(5)),
+                            border: Border.all(
+                                color: Color.fromARGB(
+                                    255, 214, 213, 213))),
+                        child: Center(child: Text("Male")),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (registerProvider.patientCount! > 0) {
+                                registerProvider. setPatientCount(registerProvider.patientCount!-1);
+                                }
+                              },
+                              icon: Icon(
+                                Icons.remove_circle_outlined,
+                                color: const Color.fromARGB(
+                                    255, 0, 104, 55),
+                              )),
+                          Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(5)),
+                                border: Border.all(
+                                    color: Color.fromARGB(
+                                        255, 214, 213, 213))),
+                            child: Consumer<RegisterProvider>(
+                              builder: (context, registerrProvider, child) {
+                                return  Center(
+                                  child: Text("${registerrProvider.patientCount}"));
+                              },
+                             
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                              registerProvider.setPatientCount(registerProvider.patientCount!+1);
+                              },
+                              icon: Icon(
+                                Icons.add_circle_outlined,
+                                color: const Color.fromARGB(
+                                    255, 0, 104, 55),
+                              )),
+                        ],
+                      ),
+                    ],
+                  ),
+      
+      
+                       Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 80,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(5)),
+                            border: Border.all(
+                                color: Color.fromARGB(
+                                    255, 214, 213, 213))),
+                        child: Center(child: Text("Female")),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (registerProvider.femalepatientCount! > 0) {
+                                 registerProvider.setFemalePatientCount(registerProvider.femalepatientCount!-1);
+                                }
+                              },
+                              icon: Icon(
+                                Icons.remove_circle_outlined,
+                                color: const Color.fromARGB(
+                                    255, 0, 104, 55),
+                              )),
+                          Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(5)),
+                                border: Border.all(
+                                    color: Color.fromARGB(
+                                        255, 214, 213, 213))),
+                                child: Consumer<RegisterProvider>(
+                              builder: (context, registerrProvider, child) {
+                                return  Center(
+                                  child: Text("${registerrProvider.femalepatientCount}"));
+                              },
+                             
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                               registerProvider.setFemalePatientCount(registerProvider.femalepatientCount!+1);
+                              },
+                              icon: Icon(
+                                Icons.add_circle_outlined,
+                                color: const Color.fromARGB(
+                                    255, 0, 104, 55),
+                              )),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+      
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: MaterialButton(
+                    //Login button function
+                    onPressed: () {
+                
+                    },
+                    color: const Color.fromARGB(255, 0, 104, 55),
+                    height: size.height / 17,
+                    minWidth: double.infinity,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child:  const Text(
+                      "Save",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+  

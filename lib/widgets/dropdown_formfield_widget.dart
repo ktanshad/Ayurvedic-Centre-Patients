@@ -29,7 +29,6 @@ class DropdownFormFieldWidget extends StatelessWidget {
         color: Colors.black,
         fontWeight:FontWeight.w400
       ),),
-            const SizedBox(height: 5,),
           DropdownButtonFormField(
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),

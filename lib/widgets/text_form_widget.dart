@@ -28,8 +28,8 @@ class TextFormWidget extends StatelessWidget {
     ),),
           const SizedBox(height: 5,),
           TextFormField(
-                // validator: validator,
-                  // controller: controller,
+                validator: validator,
+                  controller: controller,
                 
                 minLines: minLines,
                 maxLines: maxLines,

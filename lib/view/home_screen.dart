@@ -1,15 +1,12 @@
 
+import 'package:ayurvedic_centre_patients/controller/home_provider.dart';
 import 'package:ayurvedic_centre_patients/view/register_screen/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
         final Size size = MediaQuery.of(context).size;
@@ -94,61 +91,75 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
         Expanded(
-          child: ListView.builder(
-            itemCount:10,
-            itemBuilder:(context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                     color: const Color.fromARGB(255, 208, 208, 208),
-                    borderRadius: BorderRadius.all(Radius.circular(5))
-                  ),
-                 
-                  height: size.height/7,
-                  child: Column(
-                    children: [
-                      SizedBox(height:size.height/90,),
-                      SizedBox(
-                         width: size.width/1.6,
-                        child: Text("${index+1}. Vikram Singh")),
-                      SizedBox(
-                        width: size.width/1.6,
-                        child: Text("Couple Combo Package (rejuvenkjkln")),
-                          
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today_outlined,color: Colors.red,),
-                                Text("31/01/2024"),
+          child: Consumer<HomeProvider>(
+            builder: (context, HomeProvider, child) {
+                if (HomeProvider.patienList== null) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (HomeProvider.patienList!.isEmpty) {
+          return Center(child: Text("No data"));
+        } else {
+              return    ListView.builder(
+              itemCount:HomeProvider.patienList!.length,
+              itemBuilder:(context, index) {
+                final patientList=HomeProvider.patienList![index];
+                return Padding(
+                  padding: const EdgeInsets.all(14.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                       color: const Color.fromARGB(255, 208, 208, 208),
+                      borderRadius: BorderRadius.all(Radius.circular(5))
+                    ),
+                   
+                    height: size.height/6,
+                    child: Column(
+                      children: [
+                        SizedBox(height:size.height/90,),
+                        SizedBox(
+                           width: size.width/1.6,
+                          child: Text("${patientList.name}")),
+                        SizedBox(
+                          width: size.width/1.6,
+                          child: Text("${patientList.patientdetailsSet.map((e) => e.treatmentName)}")),
+                            
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.calendar_month,color: Colors.red,),
+                                  Text("${patientList.dateNdTime}"),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.people,color: Colors.red,),
+                                Text("${patientList.name}"),
+                              ],
+                            ),
+                            
                             ],
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.people_outline,color: Colors.red,),
-                              Text("Jithesh"),
-                            ],
-                          ),
+                        ),
+                        Divider(thickness: 1,color: Colors.grey,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
                           
-                          ],
-                      ),
-                      Divider(thickness: 1,color: Colors.grey,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                        
-                        Text("View Booking details"),
-                        Icon(Icons.arrow_forward_ios_rounded)
-                      ],)
-                    ],
+                          Text("View Booking details"),
+                          Icon(Icons.arrow_forward_ios_rounded)
+                        ],)
+                      ],
+                    ),
                   ),
-                ),
+                );
+              }, 
+               
               );
-            }, 
-             
-            ),
+        }
+            },
+          
+          ),
         ),
        
            Padding(

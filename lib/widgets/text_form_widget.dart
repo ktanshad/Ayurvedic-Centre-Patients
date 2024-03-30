@@ -35,7 +35,6 @@ class TextFormWidget extends StatelessWidget {
                 maxLines: maxLines,
                 
                   decoration:InputDecoration(
-
                     suffixIcon: suffixIcon,
                     filled: true,
           fillColor:Color.fromARGB(255, 245, 242, 242),

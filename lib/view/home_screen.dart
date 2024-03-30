@@ -6,9 +6,11 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
+     final homeProvider=Provider.of<HomeProvider>(context);
         final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -33,10 +35,11 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
                   child: TextFormField(
-                    // validator: validator,
-                    // controller: controller,
+                    onChanged: homeProvider.setSearchQuery,
+                    // validator: ,
+                    controller: homeProvider.searchController,
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.search_outlined),
                       filled: true,
@@ -100,10 +103,15 @@ class HomeScreen extends StatelessWidget {
         } else if (HomeProvider.patienList!.isEmpty) {
           return Center(child: Text("No data"));
         } else {
+                 final filteredPatientList = homeProvider.patienList!
+            .where((patient) =>
+                patient.name!.toLowerCase().contains(homeProvider.searchQuery.toLowerCase()))
+            .toList();
+
               return    ListView.builder(
-              itemCount:HomeProvider.patienList!.length,
+              itemCount:filteredPatientList.length,
               itemBuilder:(context, index) {
-                final patientList=HomeProvider.patienList![index];
+                   final patient = filteredPatientList[index];
                 return Padding(
                   padding: const EdgeInsets.all(14.0),
                   child: Container(
@@ -118,10 +126,10 @@ class HomeScreen extends StatelessWidget {
                         SizedBox(height:size.height/90,),
                         SizedBox(
                            width: size.width/1.6,
-                          child: Text("${patientList.name}")),
+                          child: Text("${patient.name}")),
                         SizedBox(
                           width: size.width/1.6,
-                          child: Text("${patientList.patientdetailsSet.map((e) => e.treatmentName)}")),
+                          child: Text("${patient.patientdetailsSet.map((e) => e.treatmentName)}")),
                             
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -129,13 +137,13 @@ class HomeScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Icon(Icons.calendar_month,color: Colors.red,),
-                                  Text("${patientList.dateNdTime}"),
+                                  Text("${patient.dateNdTime}"),
                               ],
                             ),
                             Row(
                               children: [
                                 Icon(Icons.people,color: Colors.red,),
-                                Text("${patientList.name}"),
+                                Text("${patient.name}"),
                               ],
                             ),
                             

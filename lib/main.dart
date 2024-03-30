@@ -1,6 +1,7 @@
 import 'package:ayurvedic_centre_patients/controller/home_provider.dart';
 import 'package:ayurvedic_centre_patients/controller/login_provider.dart';
 import 'package:ayurvedic_centre_patients/controller/register_provider.dart';
+import 'package:ayurvedic_centre_patients/view/login_screen.dart';
 import 'package:ayurvedic_centre_patients/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         
         ),
         debugShowCheckedModeBanner: false,
-        home:SplashScreen()
+        home:LoginScreen()
       ),
     );
   }
